@@ -25,6 +25,8 @@ fun LicenceScreen(
 ) {
 
     Scaffold(
+        containerColor = Color(0xFFF5F8FF),
+
         topBar = {
             TopAppBar(
                 title = {
@@ -61,8 +63,8 @@ fun LicenceScreen(
                 .fillMaxSize()
                 .background(Color(0xFFF5F8FF))
                 .padding(padding)
-                .padding(20.dp)
                 .verticalScroll(rememberScrollState())
+                .padding(20.dp)
         ) {
 
             Text(
@@ -78,14 +80,16 @@ fun LicenceScreen(
 
             Text(
                 text = "Choose the service you need",
-                color = Color.Gray
+                color = Color.DarkGray
             )
 
             Spacer(
                 modifier = Modifier.height(25.dp)
             )
 
+            // =========================
             // LEARNER LICENCE
+            // =========================
 
             Card(
                 modifier = Modifier
@@ -135,7 +139,7 @@ fun LicenceScreen(
 
                         Text(
                             text = "Apply for a new Learner Licence",
-                            color = Color.Gray,
+                            color = Color.DarkGray,
                             fontSize = 13.sp
                         )
                     }
@@ -152,7 +156,78 @@ fun LicenceScreen(
                 modifier = Modifier.height(16.dp)
             )
 
+            // =========================
+            // LL MOCK TEST
+            // =========================
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("llMockTest")
+                    },
+
+                shape = RoundedCornerShape(20.dp),
+
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                )
+            ) {
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = "📝",
+                        fontSize = 40.sp
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(16.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+
+                        Text(
+                            text = "LL Mock Test",
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(4.dp)
+                        )
+
+                        Text(
+                            text = "Practice for your Learner Licence test",
+                            color = Color.DarkGray,
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    Text(
+                        text = "›",
+                        fontSize = 30.sp,
+                        color = Color(0xFF1565C0)
+                    )
+                }
+            }
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            // =========================
             // DRIVING LICENCE
+            // =========================
 
             Card(
                 modifier = Modifier
@@ -202,7 +277,76 @@ fun LicenceScreen(
 
                         Text(
                             text = "Apply for a permanent Driving Licence",
-                            color = Color.Gray,
+                            color = Color.DarkGray,
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    Text(
+                        text = "›",
+                        fontSize = 30.sp,
+                        color = Color(0xFF1565C0)
+                    )
+                }
+            }
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            // =========================
+            // MY TEST BOOKINGS
+            // =========================
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("myTestBookings")
+                    },
+
+                shape = RoundedCornerShape(20.dp),
+
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                )
+            ) {
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = "📅",
+                        fontSize = 40.sp
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(16.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+
+                        Text(
+                            text = "My Test Bookings",
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(4.dp)
+                        )
+
+                        Text(
+                            text = "View your saved driving test preferences",
+                            color = Color.DarkGray,
                             fontSize = 13.sp
                         )
                     }
@@ -219,10 +363,13 @@ fun LicenceScreen(
                 modifier = Modifier.height(25.dp)
             )
 
+            // =========================
             // DOCUMENTS
+            // =========================
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
+
                 shape = RoundedCornerShape(20.dp),
 
                 colors = CardDefaults.cardColors(
@@ -285,8 +432,12 @@ fun LicenceScreen(
 
             Text(
                 text = "Applications are processed through the official transport authority. DriveMate can help you access and understand the application process.",
-                color = Color.Gray,
+                color = Color.DarkGray,
                 fontSize = 13.sp
+            )
+
+            Spacer(
+                modifier = Modifier.height(25.dp)
             )
         }
     }

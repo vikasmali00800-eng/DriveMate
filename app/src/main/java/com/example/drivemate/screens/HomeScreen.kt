@@ -1,5 +1,8 @@
 package com.example.drivemate.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,10 +10,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,11 +23,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.drivemate.components.InstructorCard
+import com.example.drivemate.components.WeatherWidget
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.drivemate.components.UpcomingTestCard
+
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController
+) {
 
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
@@ -41,16 +49,22 @@ fun HomeScreen(navController: NavController) {
 
     val totalLessons = 15
 
-    val progress = if (totalLessons > 0) {
+    val progress =
         (completedLessons.toFloat() / totalLessons.toFloat())
             .coerceIn(0f, 1f)
-    } else {
-        0f
+
+    val progressPercent =
+        (progress * 100).toInt()
+
+    var showContent by remember {
+        mutableStateOf(false)
     }
 
-    val progressPercent = (progress * 100).toInt()
+    LaunchedEffect(Unit) {
+        showContent = true
+    }
 
-    // Load user name
+    // LOAD USER NAME
     LaunchedEffect(user?.uid) {
 
         if (user != null) {
@@ -70,7 +84,7 @@ fun HomeScreen(navController: NavController) {
         }
     }
 
-    // Listen for completed lessons
+    // COMPLETED LESSONS
     DisposableEffect(user?.uid) {
 
         if (user == null) {
@@ -81,24 +95,31 @@ fun HomeScreen(navController: NavController) {
 
         } else {
 
-            val listener = db.collection("bookings")
-                .whereEqualTo("userId", user.uid)
-                .addSnapshotListener { snapshot, error ->
+            val listener =
+                db.collection("bookings")
+                    .whereEqualTo(
+                        "userId",
+                        user.uid
+                    )
+                    .addSnapshotListener { snapshot, error ->
 
-                    if (error == null && snapshot != null) {
+                        if (
+                            error == null &&
+                            snapshot != null
+                        ) {
 
-                        completedLessons =
-                            snapshot.documents.count { document ->
+                            completedLessons =
+                                snapshot.documents.count { document ->
 
-                                document
-                                    .getString("status")
-                                    ?.equals(
-                                        "Completed",
-                                        ignoreCase = true
-                                    ) == true
-                            }
+                                    document
+                                        .getString("status")
+                                        ?.equals(
+                                            "Completed",
+                                            ignoreCase = true
+                                        ) == true
+                                }
+                        }
                     }
-                }
 
             onDispose {
                 listener.remove()
@@ -109,142 +130,232 @@ fun HomeScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F8FF))
+            .background(
+                Color(0xFFF5F8FF)
+            )
     ) {
 
-        // Scrollable Home Content
+        // =========================================
+        // SCROLLABLE CONTENT
+        // =========================================
+
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(
+                    rememberScrollState()
+                )
                 .padding(20.dp)
         ) {
 
+            // =========================================
             // TOP BAR
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // =========================================
+
+            AnimatedVisibility(
+                visible = showContent,
+                enter =
+                    fadeIn() +
+                            slideInVertically()
             ) {
 
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu"
-                )
-
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                        Arrangement.SpaceBetween,
+                    verticalAlignment =
+                        Alignment.CenterVertically
                 ) {
 
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = "Notifications"
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(16.dp)
-                    )
-
                     IconButton(
-                        onClick = {
-                            navController.navigate("profile")
-                        }
+                        onClick = { }
                     ) {
 
                         Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Profile"
+                            imageVector =
+                                Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint =
+                                Color(0xFF1565C0)
                         )
+                    }
+
+                    Text(
+                        text = "DriveMate",
+                        fontSize = 24.sp,
+                        fontWeight =
+                            FontWeight.Bold,
+                        color =
+                            Color(0xFF1565C0)
+                    )
+
+                    Row {
+
+                        IconButton(
+                            onClick = { }
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    Icons.Default.Notifications,
+                                contentDescription =
+                                    "Notifications",
+                                tint =
+                                    Color(0xFF1565C0)
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                navController.navigate(
+                                    "profile"
+                                )
+                            }
+                        ) {
+
+                            Icon(
+                                imageVector =
+                                    Icons.Default.Person,
+                                contentDescription =
+                                    "Profile",
+                                tint =
+                                    Color(0xFF1565C0),
+                                modifier =
+                                    Modifier.size(42.dp)
+                            )
+                        }
                     }
                 }
             }
 
             Spacer(
-                modifier = Modifier.height(25.dp)
+                modifier =
+                    Modifier.height(25.dp)
             )
 
-            // USER NAME
+            // =========================================
+            // WELCOME
+            // =========================================
+
             Text(
-                text = "Hi, $userName 👋",
-                fontSize = 30.sp,
+                text = "Welcome Back 👋",
+                fontSize = 18.sp,
+                color = Color.Gray
+            )
+
+            Text(
+                text = userName,
+                fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
 
             Text(
-                text = "Ready for today's lesson?",
+                text =
+                    "Let's continue your driving journey today 🚗",
                 color = Color.Gray
             )
 
             Spacer(
-                modifier = Modifier.height(25.dp)
+                modifier =
+                    Modifier.height(25.dp)
             )
 
-            // BOOK LESSON
+            // =========================================
+            // PREMIUM BOOK LESSON
+            // =========================================
+
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(25.dp)
+                modifier =
+                    Modifier.fillMaxWidth(),
+                shape =
+                    RoundedCornerShape(28.dp),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor =
+                            Color.Transparent
+                    )
             ) {
 
                 Box(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .background(
                             Brush.horizontalGradient(
                                 listOf(
                                     Color(0xFF1565C0),
-                                    Color(0xFF42A5F5)
+                                    Color(0xFF42A5F5),
+                                    Color(0xFF64B5F6)
                                 )
                             )
                         )
-                        .padding(25.dp)
+                        .padding(24.dp)
                 ) {
 
                     Column {
 
-                        Icon(
-                            imageVector = Icons.Default.DirectionsCar,
-                            contentDescription = null,
-                            tint = Color.White
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(12.dp)
-                        )
-
                         Text(
-                            text = "Book Driving Lesson",
+                            text =
+                                "🚗 DriveMate Premium",
                             color = Color.White,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 14.sp
                         )
 
                         Spacer(
-                            modifier = Modifier.height(6.dp)
+                            modifier =
+                                Modifier.height(8.dp)
                         )
 
                         Text(
-                            text = "Find the best instructor near you",
-                            color = Color.White.copy(alpha = 0.8f)
+                            text =
+                                "Book Your Driving Lesson",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight =
+                                FontWeight.Bold
                         )
 
                         Spacer(
-                            modifier = Modifier.height(18.dp)
+                            modifier =
+                                Modifier.height(6.dp)
+                        )
+
+                        Text(
+                            text =
+                                "Professional instructors • Easy booking • Live tracking",
+                            color =
+                                Color.White.copy(
+                                    alpha = 0.9f
+                                )
+                        )
+
+                        Spacer(
+                            modifier =
+                                Modifier.height(20.dp)
                         )
 
                         Button(
                             onClick = {
-                                navController.navigate("bookLesson")
+
+                                navController.navigate(
+                                    "bookLesson"
+                                )
                             },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(12.dp)
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor =
+                                        Color.White
+                                ),
+                            shape =
+                                RoundedCornerShape(15.dp)
                         ) {
 
                             Text(
                                 text = "Book Now",
-                                color = Color(0xFF1565C0),
-                                fontWeight = FontWeight.Bold
+                                color =
+                                    Color(0xFF1565C0),
+                                fontWeight =
+                                    FontWeight.Bold
                             )
                         }
                     }
@@ -252,19 +363,25 @@ fun HomeScreen(navController: NavController) {
             }
 
             Spacer(
-                modifier = Modifier.height(25.dp)
+                modifier =
+                    Modifier.height(25.dp)
             )
 
+            // =========================================
             // PROGRESS
+            // =========================================
+
             Text(
                 text = "My Progress",
                 fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
+                fontWeight =
+                    FontWeight.Bold,
                 color = Color.Black
             )
 
             Spacer(
-                modifier = Modifier.height(12.dp)
+                modifier =
+                    Modifier.height(12.dp)
             )
 
             LinearProgressIndicator(
@@ -277,224 +394,156 @@ fun HomeScreen(navController: NavController) {
             )
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier =
+                    Modifier.height(8.dp)
             )
 
             Text(
-                text = "$progressPercent% Course Completed",
+                text =
+                    "$progressPercent% Course Completed",
                 color = Color.Gray
             )
 
             Spacer(
-                modifier = Modifier.height(25.dp)
+                modifier =
+                    Modifier.height(25.dp)
             )
 
-            // LESSONS + PAYMENTS
+            // =========================================
+            // QUICK ACTIONS
+            // =========================================
+
+            Text(
+                text = "Quick Actions",
+                fontSize = 22.sp,
+                fontWeight =
+                    FontWeight.Bold,
+                color = Color.Black
+            )
+
+            Spacer(
+                modifier =
+                    Modifier.height(15.dp)
+            )
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                    Arrangement.spacedBy(12.dp)
             ) {
 
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            navController.navigate("myBookings")
-                        },
-                    shape = RoundedCornerShape(20.dp)
+                QuickActionCard(
+                    modifier =
+                        Modifier.weight(1f),
+                    emoji = "📅",
+                    title = "Lessons",
+                    subTitle =
+                        "$completedLessons Completed"
                 ) {
 
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        Text(
-                            text = "📅",
-                            fontSize = 30.sp
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(8.dp)
-                        )
-
-                        Text(
-                            text = "Lessons",
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-
-                        Text(
-                            text = "$completedLessons Completed",
-                            color = Color.Gray,
-                            fontSize = 13.sp
-                        )
-                    }
+                    navController.navigate(
+                        "myBookings"
+                    )
                 }
 
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable {
-                            navController.navigate("payments")
-                        },
-                    shape = RoundedCornerShape(20.dp)
+                QuickActionCard(
+                    modifier =
+                        Modifier.weight(1f),
+                    emoji = "💳",
+                    title = "Payments",
+                    subTitle = "History"
                 ) {
 
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        Text(
-                            text = "💳",
-                            fontSize = 30.sp
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(8.dp)
-                        )
-
-                        Text(
-                            text = "Payments",
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-
-                        Text(
-                            text = "View History",
-                            color = Color.Gray,
-                            fontSize = 13.sp
-                        )
-                    }
+                    navController.navigate(
+                        "payments"
+                    )
                 }
             }
+
+            Spacer(
+                modifier =
+                    Modifier.height(12.dp)
+            )
+
+            Row(
+                modifier =
+                    Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                    Arrangement.spacedBy(12.dp)
+            ) {
+
+                QuickActionCard(
+                    modifier =
+                        Modifier.weight(1f),
+                    emoji = "🚦",
+                    title = "LL Test",
+                    subTitle =
+                        "Mock Test"
+                ) {
+
+                    navController.navigate(
+                        "llMockTest"
+                    )
+                }
+
+                QuickActionCard(
+                    modifier =
+                        Modifier.weight(1f),
+                    emoji = "🪪",
+                    title = "Licence",
+                    subTitle =
+                        "Apply Now"
+                ) {
+
+                    navController.navigate(
+                        "licence"
+                    )
+                }
+            }
+
+            Spacer(
+                modifier =
+                    Modifier.height(25.dp)
+            )
+
+            // =========================================
+            // NEARBY INSTRUCTOR
+            // =========================================
+
+            InstructorCard(
+                navController =
+                    navController
+            )
+
+            Spacer(
+                modifier =
+                    Modifier.height(25.dp)
+            )
+
+            // =========================================
+            // LIVE WEATHER
+            // =========================================
+
+            WeatherWidget()
 
             Spacer(
                 modifier = Modifier.height(25.dp)
             )
 
-            // NEARBY INSTRUCTOR
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
-
-                    Text(
-                        text = "Nearby Instructor",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(10.dp)
-                    )
-
-                    Text(
-                        text = "⭐ 4.9 Rating",
-                        color = Color.Black
-                    )
-
-                    Text(
-                        text = "Available Today",
-                        color = Color.Black
-                    )
-
-                    Text(
-                        text = "2 km Away",
-                        color = Color.Black
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(15.dp)
-                    )
-
-                    Button(
-                        onClick = {
-                            navController.navigate("bookLesson")
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-
-                        Text("Book Instructor")
-                    }
-                }
-            }
-
-            Spacer(
-                modifier = Modifier.height(16.dp)
+            UpcomingTestCard(
+                navController = navController
             )
 
-            // DRIVING LICENCE
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        navController.navigate("licence")
-                    },
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                )
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        text = "🪪",
-                        fontSize = 38.sp
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(16.dp)
-                    )
-
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-
-                        Text(
-                            text = "Driving Licence",
-                            fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(3.dp)
-                        )
-
-                        Text(
-                            text = "Apply for LL or Driving Licence",
-                            fontSize = 13.sp,
-                            color = Color.Gray
-                        )
-                    }
-
-                    Text(
-                        text = "›",
-                        fontSize = 30.sp,
-                        color = Color(0xFF1565C0)
-                    )
-                }
-            }
-
             Spacer(
-                modifier = Modifier.height(20.dp)
+                modifier = Modifier.height(25.dp)
             )
         }
 
+        // =========================================
         // BOTTOM NAVIGATION
+        // =========================================
+
         NavigationBar {
 
             NavigationBarItem(
@@ -511,7 +560,10 @@ fun HomeScreen(navController: NavController) {
             NavigationBarItem(
                 selected = false,
                 onClick = {
-                    navController.navigate("myBookings")
+
+                    navController.navigate(
+                        "myBookings"
+                    )
                 },
                 icon = {
                     Text("📅")
@@ -535,7 +587,10 @@ fun HomeScreen(navController: NavController) {
             NavigationBarItem(
                 selected = false,
                 onClick = {
-                    navController.navigate("profile")
+
+                    navController.navigate(
+                        "profile"
+                    )
                 },
                 icon = {
                     Text("👤")
@@ -543,6 +598,73 @@ fun HomeScreen(navController: NavController) {
                 label = {
                     Text("Profile")
                 }
+            )
+        }
+    }
+}
+
+// =========================================
+// QUICK ACTION CARD
+// =========================================
+
+@Composable
+fun QuickActionCard(
+    modifier: Modifier = Modifier,
+    emoji: String,
+    title: String,
+    subTitle: String,
+    onClick: () -> Unit
+) {
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            },
+        shape =
+            RoundedCornerShape(20.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    Color.White
+            ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = 2.dp
+            )
+    ) {
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment =
+                Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = emoji,
+                fontSize = 28.sp
+            )
+
+            Spacer(
+                modifier =
+                    Modifier.height(8.dp)
+            )
+
+            Text(
+                text = title,
+                fontWeight =
+                    FontWeight.Bold,
+                color = Color.Black,
+                fontSize = 15.sp
+            )
+
+            Text(
+                text = subTitle,
+                color = Color.Gray,
+                fontSize = 12.sp
             )
         }
     }

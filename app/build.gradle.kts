@@ -6,6 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.drivemate"
+
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -19,7 +20,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner =
+            "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -29,37 +31,112 @@ android {
             }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
+
+    // =========================
+    // COMPOSE
+    // =========================
+
+    implementation(
+        platform(libs.androidx.compose.bom)
+    )
+
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
+
+    // =========================
+    // ANDROIDX
+    // =========================
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.graphics.path)
-    testImplementation(libs.junit)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.coil.compose)
+
+    // Navigation
     implementation(libs.navigation.compose)
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+
+    // Images
+    implementation(libs.coil.compose)
+
+    // =========================
+    // WORKMANAGER
+    // =========================
+
+    implementation(
+        "androidx.work:work-runtime-ktx:2.10.5"
+    )
+
+    // =========================
+    // FIREBASE
+    // =========================
+
+    implementation(
+        platform(
+            "com.google.firebase:firebase-bom:34.7.0"
+        )
+    )
+
+    implementation(
+        "com.google.firebase:firebase-auth"
+    )
+
+    implementation(
+        "com.google.firebase:firebase-firestore"
+    )
+
+    // =========================
+    // GOOGLE PLAY SERVICES
+    // =========================
+
+    implementation(libs.play.services.location)
+
+    // =========================
+    // TESTING
+    // =========================
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(
+        platform(libs.androidx.compose.bom)
+    )
+
+    androidTestImplementation(
+        libs.androidx.compose.ui.test.junit4
+    )
+
+    androidTestImplementation(
+        libs.androidx.espresso.core
+    )
+
+    androidTestImplementation(
+        libs.androidx.junit
+    )
+
+    debugImplementation(
+        libs.androidx.compose.ui.test.manifest
+    )
+
+    debugImplementation(
+        libs.androidx.compose.ui.tooling
+    )
 }
